@@ -176,7 +176,9 @@ function display () {
         f, nf, new_data, rects;
 
     if ( nx < 0 || nx + w > width ) return;
-
+    console.log("x: "+x);
+    console.log("nx: "+nx);
+    console.log("w: "+w);
     d3.select(this).attr("x", nx);
 
     f = displayed(x);
@@ -194,8 +196,6 @@ function display () {
 
 	 	rects.attr("x", function (d) { return xscale(d.label); });
 
-// 	  rects.attr("transform", function(d) { return "translate(" + xscale(d.label) + ",0)"; })
-
     rects.enter().append("rect")
       .attr("class", "bar")
       .attr("x", function (d) { return xscale(d.label); })
@@ -205,5 +205,7 @@ function display () {
 
     rects.exit().remove();
 };
+
+//    rects.attr("transform", function(d) { return "translate(" + xscale(d.label) + ",0)"; })
 
 </script>
