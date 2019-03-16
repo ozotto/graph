@@ -5,7 +5,8 @@ var maxLength, barWidth
 var displayed, isScrollDisplayed;
 var numBars;
 var colors = [];
-var xscale, yscale, xAxis, yAxis;
+var xscale, yscale, xAxis, yAxis, lineX;
+var xOverview, yOverview;
 var graph, diagram;
 var animations, animation;
 var data = [];
@@ -80,8 +81,8 @@ function createAnimation(data) {
       .attr("id", function(d){return d.id_seance})
       .attr("class", function(d){return "animation info"+d.id_seance })
       .attr("data-toggle", "modal")
-      .attr("data-target", "#myModal")
-      .attr("transform", function (d) { return "translate("+xscale(d.scene)+","+yscale(new Date(d.date_start))+")"; } )  
+      .attr("data-target", "#animationModal")
+      .attr("transform", function (d) { return "translate("+xscale(d.scene)+","+yscale(new Date(d.date_start))+")"; } )
       .datum(function (d){ return d })
   animation.append("rect")
     .attr("fill", function (d) { 
@@ -89,6 +90,8 @@ function createAnimation(data) {
       return colors[id].color
       
     })
+    .attr("stroke", '#000')
+    .attr("shape-rendering", 'crispEdges')
     .attr("x", 0)
     .attr("y", 0)
     .attr("width", xscale.rangeBand())
@@ -100,12 +103,44 @@ function createAnimation(data) {
     .text(function (d) {return d.title; });
 }
 
+function createLinesHor(data, option){
+  
+  var x, top, h, css;
+  if(option == 'graph'){
+    x = xscale;
+    top = -margin.top;
+    h = height;
+    css = 'linex';
+  }
+  if(option == 'overview'){
+    x = xOverview;
+    top = height + margin.bottom;
+    h = top + selectorHeight;
+    css = 'linex-sub';
+  }
+
+  for(var i = 0; i< data.length ; i++){
+    lineX = diagram.append("line")
+      .attr("class", css)
+      .attr("x1", x(data[i].scene))
+      .attr("y1", top)
+      .attr("x2", x(data[i].scene))
+      .attr("y2", h)
+  }
+  lineX = diagram.append("line")
+      .attr("class", css)
+      .attr("x1", width)
+      .attr("y1", top)
+      .attr("x2", width)
+      .attr("y2", h)
+}
+
 function createOverview(){
- var xOverview = d3.scale.ordinal()
+  xOverview = d3.scale.ordinal()
                 .domain(data.map(function (d) { return d.scene; }))
                 .rangeBands([0, width]);
 
-  var yOverview = d3.time.scale()
+  yOverview = d3.time.scale()
     .domain(domainY)
     .range([0, heightOverview]);
 
@@ -115,6 +150,7 @@ function createOverview(){
   
   d3.selectAll(".mover").remove()
   d3.selectAll(".animation-sub").remove()
+  d3.selectAll(".linex-sub").remove()
 
   var subAnimation;
   for(var i = 0; i< data.length; i++){
@@ -132,7 +168,10 @@ function createOverview(){
         .attr("y", function (d) { return yOverview(new Date(d.date_start)) })
         .attr("width", xOverview.rangeBand())
         .attr("height", function (d) { return yOverview( new Date(d.date_end) ) - yOverview( new Date(d.date_start) ) })
+
   }
+
+  createLinesHor(data, 'overview')
 
   displayed = d3.scale.quantize()
               .domain([0, width])
@@ -220,6 +259,9 @@ function displayProg(prog){
   {
     createOverview()
   }
+
+  createLinesHor(dataSplice, 'graph')
+  
 }
 
 function display () {
@@ -252,7 +294,7 @@ function display () {
 };
 
 
-$('#myModal').on('show.bs.modal', function(d) {
+$('#animationModal').on('show.bs.modal', function(d) {
   var animationSelected = ".info"+d.relatedTarget.id 
 
   var d = d3.select(animationSelected).data().pop();
@@ -283,6 +325,7 @@ function resize() {
   diagram.select(".x.axis").call(xAxis);  
 
   d3.selectAll(".animation").remove();
+  d3.selectAll(".linex").remove();
   
   for(var i = 0; i< dataSplice.length; i++){
     createAnimation(dataSplice[i].dataScene)
@@ -291,7 +334,7 @@ function resize() {
   {
     createOverview()
   }
-
+  createLinesHor(dataSplice, 'graph')
 }
 
 

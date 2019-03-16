@@ -1,6 +1,6 @@
 #animationsGraph {
     width: 95%;
-    padding: 10px;
+    padding: 20px;
 }
 
 .axis {
@@ -50,6 +50,14 @@ svg {
   fill: steelblue;
   fill-opacity: .25;
   shape-rendering: crispEdges;
+}
+
+.linex, .linex-sub{
+	stroke: #000;
+	shape-rendering: crispEdges;
+}
+.linex-sub{
+	stroke-opacity: .5;
 }
 
 rect.mover {
