@@ -1,3 +1,4 @@
+
 var domainY;
 var margin;
 var marginOverview, selectorHeight, heightOverview;
@@ -55,6 +56,10 @@ function updateData(prog){
   for(var i = 0; i< dataSplice.length; i++){
     createAnimation(dataSplice[i].dataScene)
   }
+  if (isScrollDisplayed)
+  {
+    createOverview()
+  }
 
 }
 
@@ -95,13 +100,16 @@ function createOverview(){
     .attr("class", "overview")
     .attr("transform", "translate(0, "+(height + heightOverview)+")");
   
+  d3.selectAll(".mover").remove()
+  d3.selectAll(".animation-sub").remove()
+
   var subAnimation;
   for(var i = 0; i< data.length; i++){
     subAnimation = overview.selectAll("overview")
       .data(data[i].dataScene)
       .enter()
         .append("g")
-        .attr("class", function(d){return "animation-sub"+d.id_seance })        
+        .attr("class", function(d){return "animation-sub sub"+d.id_seance })        
     subAnimation.append("rect")
         .attr("fill", function (d) { return colors(Math.floor((Math.random() * 20) + 1)) })
         .attr("x", function (d) { return xOverview(d.scene) })
@@ -237,4 +245,3 @@ $('#myModal').on('show.bs.modal', function(d) {
   let modalBody = d3.selectAll(".modal-body");
   modalBody.html("Category: " + d.category + "<br>" + "Scene: " + d.scene + "<br>" + "Start Date: " + d.date_start + "<br>" + "End Date: " + d.date_end);
 })
-
