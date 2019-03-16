@@ -250,13 +250,33 @@ $('#myModal').on('show.bs.modal', function(d) {
 d3.select(window).on('resize', resize); 
 
 function resize() {
-  
+    
   width = ( parseInt(d3.select('#animationsGraph').style('width'), 10) ) - margin.left - margin.right
-  xscale.rangeBands([0, width]);
   
+  maxLength = d3.max(data.map(function(d){ return d.scene.length}))
+  barWidth = maxLength * 7;
+  numBars = Math.round(width/barWidth);
+  isScrollDisplayed = barWidth * data.length > width;
+
+  var dataSplice = data.slice(0, numBars);
+
   d3.select(".programmation").attr("width", width + margin.left + margin.right)  
-  
+
+  xscale.rangeBands([0, width])
+    .domain(dataSplice.map(function (d) { return d.scene; }))
+
   diagram.select(".x.axis").call(xAxis);  
+
+  d3.selectAll(".animation").remove();
+  
+  for(var i = 0; i< dataSplice.length; i++){
+    createAnimation(dataSplice[i].dataScene)
+  }
+  if (isScrollDisplayed)
+  {
+    createOverview()
+  }
+
 }
 
 
