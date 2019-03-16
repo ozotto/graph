@@ -4,18 +4,19 @@ var marginOverview, selectorHeight, heightOverview;
 var maxLength, barWidth
 var displayed, isScrollDisplayed;
 var numBars;
-var colors;
+var colors = [];
 var xscale, yscale, xAxis, yAxis;
 var graph, diagram;
 var animations, animation;
 var data = [];
 
-function initAddress() {
+function loadGraph() {
   $("ul li#d1").addClass("active");
   initData('d1')
+  initColors()
   displayProg('d1')
 }
-window.onload = initAddress;
+window.onload = loadGraph;
 
 function initData(prog){
   if(prog == 'd1'){
@@ -34,6 +35,15 @@ function initData(prog){
     domainY = [new Date('2019-05-05T09:00:00'), new Date('2019-05-05T20:00:00')]
   }
   data = getData(prog) 
+}
+
+function initColors(){
+  var colorScale = d3.scale.category20();
+  for(var x = 0; x<data.length; x++){
+    var colorData;
+    colorData = { scene:data[x].scene, color: colorScale(Math.floor((Math.random() * 20) + 1)) };
+    colors.push(colorData)
+  }  
 }
 
 function updateData(prog){
@@ -74,7 +84,11 @@ function createAnimation(data) {
       .attr("transform", function (d) { return "translate("+xscale(d.scene)+","+yscale(new Date(d.date_start))+")"; } )  
       .datum(function (d){ return d })
   animation.append("rect")
-    .attr("fill", function (d) { return colors(Math.floor((Math.random() * 20) + 1)) })
+    .attr("fill", function (d) { 
+      var id = colors.map(function(e) { return e.scene; }).indexOf(d.scene);
+      return colors[id].color
+      
+    })
     .attr("x", 0)
     .attr("y", 0)
     .attr("width", xscale.rangeBand())
@@ -110,7 +124,10 @@ function createOverview(){
         .append("g")
         .attr("class", function(d){return "animation-sub sub"+d.id_seance })        
     subAnimation.append("rect")
-        .attr("fill", function (d) { return colors(Math.floor((Math.random() * 20) + 1)) })
+        .attr("fill", function (d) { 
+          var id = colors.map(function(e) { return e.scene; }).indexOf(d.scene);
+          return colors[id].color
+        })
         .attr("x", function (d) { return xOverview(d.scene) })
         .attr("y", function (d) { return yOverview(new Date(d.date_start)) })
         .attr("width", xOverview.rangeBand())
@@ -149,8 +166,6 @@ function displayProg(prog){
   barWidth = maxLength * 7;
   numBars = Math.round(width/barWidth);
   isScrollDisplayed = barWidth * data.length > width;
-
-  colors = d3.scale.category20();
 
   var dataSplice = data.slice(0, numBars);
 
