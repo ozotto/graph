@@ -1,4 +1,3 @@
-
 var domainY;
 var margin;
 var marginOverview, selectorHeight, heightOverview;
@@ -138,7 +137,8 @@ function createOverview(){
 function displayProg(prog){
 
   margin = {top: 50, right: 20, bottom: 20, left: 40},
-  width = 800 - margin.left - margin.right,
+  //width = 800 - margin.left - margin.right,
+  width = ( parseInt(d3.select('#animationsGraph').style('width'), 10) ) - margin.left - margin.right
   height = 500 - margin.top - margin.bottom;
 
   marginOverview = {top: 30, right: 10, bottom: 20, left: 40};
@@ -177,6 +177,7 @@ function displayProg(prog){
       .tickPadding(10);
 
   graph = d3.select("#animationsGraph").append("svg")
+      .attr("class", "programmation")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom + selectorHeight)
     
@@ -245,3 +246,18 @@ $('#myModal').on('show.bs.modal', function(d) {
   let modalBody = d3.selectAll(".modal-body");
   modalBody.html("Category: " + d.category + "<br>" + "Scene: " + d.scene + "<br>" + "Start Date: " + d.date_start + "<br>" + "End Date: " + d.date_end);
 })
+
+d3.select(window).on('resize', resize); 
+
+function resize() {
+  
+  width = ( parseInt(d3.select('#animationsGraph').style('width'), 10) ) - margin.left - margin.right
+  xscale.rangeBands([0, width]);
+  
+  d3.select(".programmation").attr("width", width + margin.left + margin.right)  
+  
+  diagram.select(".x.axis").call(xAxis);  
+}
+
+
+
